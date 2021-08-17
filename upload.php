@@ -1,5 +1,4 @@
 <?php
-// required headers
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
@@ -12,18 +11,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	$imageType = $_FILES['sendimage']['type'];
 	$imagePath = $_FILES['sendimage']['tmp_name'];
 
-	$allowed_mime_types = array('image/gif', 'image/jpg', 'image/jpeg', 'image/png', 'image/bmp');
+	$target_file = 'temp\\'. $imageName;
+
+	//Tipo de aqruivos permitidos
+	$allowed_mime_types = array('image/bmp');
+	//Verifica se o arquivo foi selecionado
 	if(empty($imagePath)){
 		$error = json_encode(array('status' => false, 
 			'message' => 'Sorry, You need to select a image before submitting.'));
 		echo $error;
 		exit();
 	}
+	//Verifica o tipo do arquivo
 	if(in_array($imageType, $allowed_mime_types)){
-		print $imagePath;
+		if(move_uploaded_file($_FILES["sendimage"]["tmp_name"], $target_file)){
+			//Exibe o local do arquivo
+			$success =  json_encode(array('status' => true, 'image' => $target_file));
+			echo $success;
+		}
 	}else{
 		$error = json_encode(array('status' => false, 
-			'message' => 'Sorry, only GIF, JPG/JPEG, PNG and BITMAP formats are supported.'));
+			'message' => 'Sorry, only BITMAP format are supported.'));
 		echo $error;
 		exit();
 	}
@@ -32,14 +40,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <!DOCTYPE html>
 <html>
 <head>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
 	<meta charset="utf-8">
-	<title></title>
+	<title>Upload</title>
 </head>
-<body>
+<body class="m-5">
 
-<form enctype="multipart/form-data" action="upload.php" method="POST">
-    Imagem: <input name="sendimage" type="file" />
-    <input type="submit" value="Send File" />
+<form enctype="multipart/form-data" method="POST">
+	<div class="form-group">
+		<input name="sendimage" class="form-control" type="file" />
+	</div>
+    <input type="submit" class="btn btn-primary mt-2" value="Enviar" />
 </form>
 
 </body>
