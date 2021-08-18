@@ -13,7 +13,7 @@ if(isset($_GET['file'])){
 		header('Expires: 0');
 		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 		header('Pragma: public');
-		header('Content-Length: ' . filesize($file_url)); //Absolute URL
+		header('Content-Length: ' . filesize($file_url));
 		ob_clean();
 		flush();
 		readfile($file_url);

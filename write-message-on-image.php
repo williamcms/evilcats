@@ -5,7 +5,7 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-//Remover
+
 $message = $_POST['message'];
 $file = $_POST['file'];
 
@@ -25,7 +25,7 @@ if(!in_array($messageEnd, str_split($encodedMessage, 8))){
 	$encodedMessage .= $messageEnd;
 }
 
-//Carrega a imagem
+//Carrega a imagem na memória
 $imageToWrite = imagecreatefrombmp($file);
 
 //Verifica as dimensões da imagem
@@ -54,7 +54,7 @@ for($y = 0; $y < $height; $y++){
 		//Converte o Azul para Binário
 		$binColor = str_pad(decbin($blue), 8, '0', STR_PAD_LEFT);
 
-		//Insere a mensagem no bit final da cor
+		//Insere a mensagem no bit final (LSB) da cor
 		$binColor[strlen($binColor) - 1] = $encodedMessage[$messagePosition];
 		//Converte o binário para número (cor)
 		$EditColor = bindec($binColor);
@@ -78,7 +78,8 @@ imagebmp($imageToWrite, $newImage);
 //Apaga a imagem que foi previamente carregada na memória
 imagedestroy($imageToWrite);
 
-echo json_encode(array('status' => true, 'message' => 'File edited successfully.', 'file' => $newImage));
+echo json_encode(array('status' => true, 'message' => 'File edited successfully.', 'image' => $newImage));
+exit();
 }
 ?>
 <!DOCTYPE html>

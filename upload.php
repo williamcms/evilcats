@@ -5,11 +5,11 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-	$file = json_decode(file_get_contents('php://input'), true);
+	$file = $_FILES['sendimage'];
 
-	$imageName = $_FILES['sendimage']['name'];
-	$imageType = $_FILES['sendimage']['type'];
-	$imagePath = $_FILES['sendimage']['tmp_name'];
+	$imageName = $file['name'];
+	$imageType = $file['type'];
+	$imagePath = $file['tmp_name'];
 
 	$target_file = 'temp\\'. $imageName;
 
@@ -17,22 +17,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	$allowed_mime_types = array('image/bmp');
 	//Verifica se o arquivo foi selecionado
 	if(empty($imagePath)){
-		$error = json_encode(array('status' => false, 
-			'message' => 'Sorry, You need to select a image before submitting.'));
-		echo $error;
+		echo $error = json_encode(array('status' => false, 'message' => 'Sorry, You need to select a image before submitting.'));
 		exit();
 	}
 	//Verifica o tipo do arquivo
 	if(in_array($imageType, $allowed_mime_types)){
 		if(move_uploaded_file($_FILES["sendimage"]["tmp_name"], $target_file)){
 			//Exibe o local do arquivo
-			$success =  json_encode(array('status' => true, 'image' => $target_file));
-			echo $success;
+			echo  json_encode(array('status' => true, 'image' => $target_file));
+			exit();
 		}
 	}else{
-		$error = json_encode(array('status' => false, 
-			'message' => 'Sorry, only BITMAP format are supported.'));
-		echo $error;
+		echo json_encode(array('status' => false, 'message' => 'Sorry, only BITMAP format are supported.'));
 		exit();
 	}
 }
